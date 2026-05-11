@@ -765,7 +765,7 @@ async function analyzeAI(files,type){
       if(txt)txt.textContent='🤖 Claude lit le texte dans tes images...';
       const imgs=await Promise.all(imgFiles.map(f=>new Promise(res=>{const r=new FileReader();r.onload=e=>res({data:e.target.result.split(',')[1],type:f.type});r.readAsDataURL(f);})));
       const content=[...imgs.map(img=>({type:'image',source:{type:'base64',media_type:img.type,data:img.data}})),{type:'text',text:`Retranscris EXACTEMENT le texte visible dans chaque image Instagram.\nFormat strict (une ligne par slide) :\nSLIDE 1: [texte]\nSLIDE 2: [texte]\netc.\nNe rajoute rien de ta part.`}];
-      const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-opus-4-5',max_tokens:2000,messages:[{role:'user',content}]})});
+      const resp=await fetch('https://slf-api-proxy.meldigitalsuccess.workers.dev',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-opus-4-5',max_tokens:2000,messages:[{role:'user',content}]})});
       const data=await resp.json();
       const text=data.content?.[0]?.text||'';
       if(el)el.classList.remove('show');
@@ -829,7 +829,7 @@ async function triggerGen(){
   if(el){el.classList.add('show');if(txt)txt.textContent='🤖 Claude génère ton contenu...';}
   try{
     const prompt=`Tu es un expert en contenu Instagram/TikTok. Réponds en français, ton naturel et humain.\nHook : "${hook}"\nStyle : ${curPT}\nType : ${type==='carousel'?'Carousel (génère 7 slides)':type==='reelp'?'Script reel parlé 60 sec':'Texte reel'}\n${type==='carousel'?'Format : SLIDE 1: [texte] SLIDE 2: [texte] etc.\n':''}\nGénère aussi LÉGENDE: [légende] et CTA: [appel à l\'action fort]`;
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1500,messages:[{role:'user',content:prompt}]})});
+    const resp=await fetch('https://slf-api-proxy.meldigitalsuccess.workers.dev',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1500,messages:[{role:'user',content:prompt}]})});
     const data=await resp.json();
     const text=data.content?.[0]?.text||'';
     if(el)el.classList.remove('show');
@@ -997,7 +997,7 @@ Génère une analyse psychologique profonde en JSON strict (sans markdown, sans 
 }`;
 
   try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    const resp = await fetch('https://slf-api-proxy.meldigitalsuccess.workers.dev', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
       body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1000, messages: [{ role: 'user', content: prompt }] })
