@@ -1,0 +1,23 @@
+{
+  "name": "Studio Lab Factory",
+  "short_name": "Studio Lab",
+  "description": "Ton laboratoire de création de contenu Instagram",
+  "start_url": "/studio-lab-factory/studio-lab-factory-login.html",
+  "scope": "/studio-lab-factory/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#5d0505",
+  "icons": [
+    {
+      "src": "STUDIO_LAB_FACTORY.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "STUDIO_LAB_FACTORY.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
