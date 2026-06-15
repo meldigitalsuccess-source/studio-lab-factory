@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Studio Lab Factory — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Jost',sans-serif;background:#F4F2ED;min-height:100vh;color:#1A1A1A;}
+.header{background:#0E0D0C;color:#F4F2ED;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;}
+.header h1{font-size:16px;font-weight:400;letter-spacing:0.12em;text-transform:uppercase;}
+.header-right{display:flex;align-items:center;gap:16px;font-size:12px;color:#9E9B94;}
+.btn-logout-h{background:transparent;border:1px solid #9E9B94;color:#9E9B94;padding:6px 14px;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;font-family:'Jost',sans-serif;}
+.container{max-width:1100px;margin:0 auto;padding:32px 24px;}
+.tabs{display:flex;gap:4px;margin-bottom:28px;border-bottom:1px solid rgba(14,13,12,0.1);padding-bottom:0;}
+.tab{padding:10px 24px;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;border:none;background:none;font-family:'Jost',sans-serif;color:#9E9B94;border-bottom:2px solid transparent;margin-bottom:-1px;}
+.tab.active{color:#5d0505;border-bottom-color:#5d0505;font-weight:600;}
+.panel{display:none;}.panel.active{display:block;}
+.card{background:#fff;border:1px solid rgba(14,13,12,0.08);border-radius:10px;padding:24px;margin-bottom:20px;}
+.card-title{font-size:13px;font-weight:600;color:#5d0505;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:20px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.form-group{display:flex;flex-direction:column;gap:6px;}
+.form-group label{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#9E9B94;font-weight:400;}
+.form-group input,.form-group select,.form-group textarea{padding:10px 12px;border:1px solid rgba(14,13,12,0.15);border-radius:6px;font-size:13px;font-family:'Jost',sans-serif;font-weight:300;outline:none;background:#fff;}
+.form-group input:focus{border-color:#5d0505;}
+.btn{padding:10px 20px;border:none;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;font-family:'Jost',sans-serif;font-weight:500;border-radius:6px;transition:all .15s;}
+.btn-primary{background:#5d0505;color:#fff;}.btn-primary:hover{background:#3d0303;}
+.btn-danger{background:#B22222;color:#fff;}.btn-danger:hover{background:#8B0000;}
+.btn-sm{padding:6px 12px;font-size:10px;}
+.btn-success{background:#2E7D32;color:#fff;}
+.table{width:100%;border-collapse:collapse;}
+.table th{font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:#9E9B94;padding:10px 12px;text-align:left;border-bottom:1px solid rgba(14,13,12,0.08);}
+.table td{padding:12px;font-size:13px;border-bottom:1px solid rgba(14,13,12,0.05);vertical-align:middle;}
+.table tr:hover td{background:#FAFAF8;}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:600;letter-spacing:0.06em;}
+.badge-active{background:#E8F5E9;color:#2E7D32;}
+.badge-inactive{background:#FFEBEE;color:#B22222;}
+.badge-admin{background:#FFF3E0;color:#E65100;}
+.notif{position:fixed;bottom:24px;right:24px;background:#0E0D0C;color:#F4F2ED;padding:12px 20px;border-radius:8px;font-size:13px;z-index:999;display:none;max-width:320px;}
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#F4F2ED;}
+.login-box{background:#fff;border:1px solid rgba(14,13,12,0.08);border-radius:12px;padding:40px;width:100%;max-width:380px;text-align:center;}
+.login-title{font-size:22px;font-weight:600;color:#5d0505;margin-bottom:8px;letter-spacing:0.04em;}
+.login-sub{font-size:12px;color:#9E9B94;margin-bottom:28px;}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+.stat-card{background:#fff;border:1px solid rgba(14,13,12,0.08);border-radius:10px;padding:20px;text-align:center;}
+.stat-num{font-size:28px;font-weight:700;color:#5d0505;}
+.stat-label{font-size:11px;color:#9E9B94;text-transform:uppercase;letter-spacing:0.08em;margin-top:4px;}
+.search-bar{padding:10px 14px;border:1px solid rgba(14,13,12,0.15);border-radius:6px;font-size:13px;font-family:'Jost',sans-serif;width:100%;max-width:320px;outline:none;margin-bottom:16px;}
+.hook-item,.prompt-item{display:flex;align-items:flex-start;justify-content:space-between;padding:12px;border:1px solid rgba(14,13,12,0.08);border-radius:8px;margin-bottom:8px;gap:12px;}
+.hook-text{font-size:13px;color:#1A1A1A;flex:1;line-height:1.5;}
+.hook-cat{font-size:10px;color:#9E9B94;margin-top:4px;text-transform:uppercase;letter-spacing:0.06em;}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen" class="login-wrap">
+  <div class="login-box">
+    <div class="login-title">⚙️ Admin Panel</div>
+    <div class="login-sub">Studio Lab Factory</div>
+    <div style="display:flex;flex-direction:column;gap:14px;text-align:left;">
+      <div class="form-group">
+        <label>Mot de passe admin</label>
+        <input type="password" id="admin-pwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')adminLogin()">
+      </div>
+      <button class="btn btn-primary" onclick="adminLogin()" style="width:100%;padding:12px;">Accéder →</button>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app-screen" style="display:none;">
+  <div class="header">
+    <h1>⚙️ Studio Lab Factory — Admin</h1>
+    <div class="header-right">
+      <span id="admin-user-label"></span>
+      <button class="btn-logout-h" onclick="adminLogout()">Déconnexion</button>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- STATS -->
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-num" id="stat-users">—</div><div class="stat-label">Utilisateurs</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-active">—</div><div class="stat-label">Actifs</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-hooks">—</div><div class="stat-label">Hooks</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-prompts">—</div><div class="stat-label">Prompts</div></div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('users')">👥 Utilisateurs</button>
+      <button class="tab" onclick="switchTab('hooks')">📱 Hooks</button>
+      <button class="tab" onclick="switchTab('prompts')">⚙️ Prompts</button>
+    </div>
+
+    <!-- USERS PANEL -->
+    <div id="panel-users" class="panel active">
+      <div class="card">
+        <div class="card-title">➕ Créer un utilisateur</div>
+        <div class="form-row">
+          <div class="form-group"><label>Identifiant</label><input type="text" id="new-username" placeholder="ex: sophie2024"></div>
+          <div class="form-group"><label>Mot de passe</label><input type="password" id="new-password" placeholder="Minimum 8 caractères"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Rôle</label>
+            <select id="new-role">
+              <option value="user">Utilisateur</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <div class="form-group" style="justify-content:flex-end;">
+            <button class="btn btn-primary" onclick="createUser()" style="align-self:flex-end;">Créer l'utilisateur →</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">👥 Liste des utilisateurs</div>
+        <input class="search-bar" placeholder="🔍 Rechercher un utilisateur..." oninput="filterUsers(this.value)">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Identifiant</th>
+              <th>Rôle</th>
+              <th>Statut</th>
+              <th>Dernière connexion</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="users-table"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- HOOKS PANEL -->
+    <div id="panel-hooks" class="panel">
+      <div class="card">
+        <div class="card-title">➕ Ajouter un hook</div>
+        <div class="form-row">
+          <div class="form-group" style="grid-column:1/-1"><label>Texte du hook</label><input type="text" id="new-hook-text" placeholder="ex: Je vais te dire ce que personne ne dit sur..."></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Catégorie</label>
+            <select id="new-hook-cat">
+              <option value="curiosite">Curiosité</option>
+              <option value="transformation">Transformation</option>
+              <option value="education">Éducation</option>
+              <option value="mindset">Mindset</option>
+              <option value="engagement">Engagement</option>
+              <option value="vente">Vente</option>
+              <option value="coulisses">Coulisses</option>
+              <option value="autorite">Autorité</option>
+            </select>
+          </div>
+          <div class="form-group" style="justify-content:flex-end;">
+            <button class="btn btn-primary" onclick="addHook()" style="align-self:flex-end;">Ajouter →</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📱 Bibliothèque de hooks (<span id="hooks-count">0</span>)</div>
+        <input class="search-bar" placeholder="🔍 Rechercher un hook..." oninput="filterHooks(this.value)">
+        <div id="hooks-list"></div>
+      </div>
+    </div>
+
+    <!-- PROMPTS PANEL -->
+    <div id="panel-prompts" class="panel">
+      <div class="card">
+        <div class="card-title">➕ Ajouter un prompt</div>
+        <div class="form-row">
+          <div class="form-group"><label>Nom du prompt</label><input type="text" id="new-prompt-name" placeholder="ex: Transformation personnelle"></div>
+          <div class="form-group">
+            <label>Catégorie</label>
+            <select id="new-prompt-cat">
+              <option value="transformation">Transformation</option>
+              <option value="education">Éducation</option>
+              <option value="mindset">Mindset</option>
+              <option value="coulisses">Coulisses</option>
+              <option value="autorite">Autorité</option>
+              <option value="engagement">Engagement</option>
+              <option value="vente">Vente</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:16px;"><label>Texte du prompt</label>
+          <textarea id="new-prompt-text" placeholder="ex: Réécris en racontant une transformation personnelle authentique, avant/après clair. Ton humain." style="min-height:100px;resize:vertical;"></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="addPrompt()">Ajouter le prompt →</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">⚙️ Bibliothèque de prompts (<span id="prompts-count">0</span>)</div>
+        <input class="search-bar" placeholder="🔍 Rechercher un prompt..." oninput="filterPrompts(this.value)">
+        <div id="prompts-list"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="notif" id="notif"></div>
+
+<script>
+const SB_URL='https://ayvppvheeegczreiyllx.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF5dnBwdmhlZWVnY3pyZWl5bGx4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3MTc4MzgsImV4cCI6MjA5MzI5MzgzOH0.khyU1SItlBnVgaT2emN66unQZPeIkpw6K5UapsScviA';
+const ADMIN_PWD='SLFadmin2024!';
+
+let allUsers=[], allHooks=[], allPrompts=[];
+
+function notify(msg){const n=document.getElementById('notif');n.textContent=msg;n.style.display='block';setTimeout(()=>n.style.display='none',3000);}
+
+function adminLogin(){
+  const pwd=document.getElementById('admin-pwd').value;
+  if(pwd===ADMIN_PWD){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app-screen').style.display='block';
+    document.getElementById('admin-user-label').textContent='Admin connecté';
+    loadAll();
+  }else{notify('❌ Mot de passe incorrect');}
+}
+
+function adminLogout(){
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('app-screen').style.display='none';
+  document.getElementById('admin-pwd').value='';
+}
+
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('panel-'+t).classList.add('active');
+}
+
+async function sb(method,table,body,params=''){
+  const url=`${SB_URL}/rest/v1/${table}${params}`;
+  const res=await fetch(url,{method,headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`,'Content-Type':'application/json','Prefer':'return=representation'},body:body?JSON.stringify(body):undefined});
+  return res.json();
+}
+
+async function loadAll(){
+  await Promise.all([loadUsers(),loadHooks(),loadPrompts()]);
+}
+
+async function loadUsers(){
+  const data=await sb('GET','users','','?select=*&order=created_at.desc');
+  allUsers=data||[];
+  renderUsers(allUsers);
+  document.getElementById('stat-users').textContent=allUsers.length;
+  document.getElementById('stat-active').textContent=allUsers.filter(u=>u.is_active).length;
+}
+
+function renderUsers(users){
+  const tbody=document.getElementById('users-table');
+  if(!users.length){tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:#9E9B94;padding:24px;">Aucun utilisateur</td></tr>';return;}
+  tbody.innerHTML=users.map(u=>`
+    <tr>
+      <td><strong>${u.username}</strong></td>
+      <td><span class="badge ${u.role==='admin'?'badge-admin':'badge-active'}">${u.role}</span></td>
+      <td><span class="badge ${u.is_active?'badge-active':'badge-inactive'}">${u.is_active?'Actif':'Inactif'}</span></td>
+      <td style="color:#9E9B94;font-size:12px;">${u.last_login?new Date(u.last_login).toLocaleDateString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'Jamais'}</td>
+      <td style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-sm ${u.is_active?'btn-danger':'btn-success'}" onclick="toggleUser('${u.id}',${u.is_active})">${u.is_active?'Désactiver':'Activer'}</button>
+        <button class="btn btn-sm" style="background:#EEE;color:#333;" onclick="resetPwd('${u.id}','${u.username}')">Réinitialiser mdp</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}','${u.username}')">Supprimer</button>
+      </td>
+    </tr>`).join('');
+}
+
+function filterUsers(q){renderUsers(allUsers.filter(u=>u.username.toLowerCase().includes(q.toLowerCase())));}
+
+async function createUser(){
+  const username=document.getElementById('new-username').value.trim();
+  const password=document.getElementById('new-password').value;
+  const role=document.getElementById('new-role').value;
+  if(!username||!password){notify('⚠️ Remplis tous les champs');return;}
+  if(password.length<6){notify('⚠️ Mot de passe trop court (min 6 caractères)');return;}
+  const res=await sb('POST','users',{username,password_hash:password,role,is_active:true});
+  if(res&&!res.error){notify('✅ Utilisateur créé !');document.getElementById('new-username').value='';document.getElementById('new-password').value='';loadUsers();}
+  else notify('❌ Erreur : '+(res?.error?.message||'Identifiant déjà utilisé'));
+}
+
+async function toggleUser(id,isActive){
+  await sb('PATCH','users',{is_active:!isActive},`?id=eq.${id}`);
+  notify(isActive?'Utilisateur désactivé':'Utilisateur activé');
+  loadUsers();
+}
+
+async function resetPwd(id,username){
+  const newPwd=prompt(`Nouveau mot de passe pour ${username} :`);
+  if(!newPwd)return;
+  await sb('PATCH','users',{password_hash:newPwd},`?id=eq.${id}`);
+  notify('✅ Mot de passe réinitialisé');
+}
+
+async function deleteUser(id,username){
+  if(!confirm(`Supprimer définitivement ${username} ? Tous ses projets seront perdus.`))return;
+  await sb('DELETE','users','',`?id=eq.${id}`);
+  notify('🗑️ Utilisateur supprimé');
+  loadUsers();
+}
+
+// HOOKS
+async function loadHooks(){
+  const data=await sb('GET','hooks','','?select=*&order=created_at.desc');
+  allHooks=data||[];
+  renderHooks(allHooks);
+  document.getElementById('stat-hooks').textContent=allHooks.length;
+  document.getElementById('hooks-count').textContent=allHooks.length;
+}
+
+function renderHooks(hooks){
+  const list=document.getElementById('hooks-list');
+  if(!hooks.length){list.innerHTML='<div style="text-align:center;padding:24px;color:#9E9B94;font-size:13px;">Aucun hook — ajoutez-en ci-dessus</div>';return;}
+  list.innerHTML=hooks.map(h=>`
+    <div class="hook-item">
+      <div><div class="hook-text">${h.text}</div><div class="hook-cat">${h.category||'général'}</div></div>
+      <button class="btn btn-sm btn-danger" onclick="deleteHook('${h.id}')">✕</button>
+    </div>`).join('');
+}
+
+function filterHooks(q){renderHooks(allHooks.filter(h=>h.text.toLowerCase().includes(q.toLowerCase())));}
+
+async function addHook(){
+  const text=document.getElementById('new-hook-text').value.trim();
+  const category=document.getElementById('new-hook-cat').value;
+  if(!text){notify('⚠️ Écris le texte du hook');return;}
+  await sb('POST','hooks',{text,category,is_shared:true});
+  notify('✅ Hook ajouté !');
+  document.getElementById('new-hook-text').value='';
+  loadHooks();
+}
+
+async function deleteHook(id){
+  await sb('DELETE','hooks','',`?id=eq.${id}`);
+  notify('🗑️ Hook supprimé');
+  loadHooks();
+}
+
+// PROMPTS
+async function loadPrompts(){
+  const data=await sb('GET','prompts','','?select=*&order=created_at.desc');
+  allPrompts=data||[];
+  renderPrompts(allPrompts);
+  document.getElementById('stat-prompts').textContent=allPrompts.length;
+  document.getElementById('prompts-count').textContent=allPrompts.length;
+}
+
+function renderPrompts(prompts){
+  const list=document.getElementById('prompts-list');
+  if(!prompts.length){list.innerHTML='<div style="text-align:center;padding:24px;color:#9E9B94;font-size:13px;">Aucun prompt — ajoutez-en ci-dessus</div>';return;}
+  list.innerHTML=prompts.map(p=>`
+    <div class="prompt-item">
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:600;color:#1A1A1A;margin-bottom:4px;">${p.name}</div>
+        <div style="font-size:12px;color:#9E9B94;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.06em;">${p.category}</div>
+        <div style="font-size:12px;color:#6B6860;line-height:1.5;">${p.text.substring(0,120)}${p.text.length>120?'...':''}</div>
+      </div>
+      <button class="btn btn-sm btn-danger" onclick="deletePrompt('${p.id}')">✕</button>
+    </div>`).join('');
+}
+
+function filterPrompts(q){renderPrompts(allPrompts.filter(p=>p.name.toLowerCase().includes(q.toLowerCase())||p.text.toLowerCase().includes(q.toLowerCase())));}
+
+async function addPrompt(){
+  const name=document.getElementById('new-prompt-name').value.trim();
+  const category=document.getElementById('new-prompt-cat').value;
+  const text=document.getElementById('new-prompt-text').value.trim();
+  if(!name||!text){notify('⚠️ Remplis tous les champs');return;}
+  await sb('POST','prompts',{name,category,text,is_shared:true});
+  notify('✅ Prompt ajouté !');
+  document.getElementById('new-prompt-name').value='';
+  document.getElementById('new-prompt-text').value='';
+  loadPrompts();
+}
+
+async function deletePrompt(id){
+  await sb('DELETE','prompts','',`?id=eq.${id}`);
+  notify('🗑️ Prompt supprimé');
+  loadPrompts();
+}
+</script>
+</body>
+</html>
